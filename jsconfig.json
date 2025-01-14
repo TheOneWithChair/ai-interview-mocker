@@ -1,7 +1,18 @@
-{
-  "compilerOptions": {
-    "paths": {
-      "@/*": ["./*"]
-    }
-  }
-}
+// {
+//   "compilerOptions": {
+//     "jsx": "react",
+//     "paths": {
+//       "@/*": ["./*"]
+//     }
+//   }
+// }
+// {
+//   "compilerOptions": {
+//     "baseUrl": ".",
+//     "paths": {
+//       "@/*": ["./*"]
+//     },
+//     "jsx": "preserve"
+//   },
+//   "exclude": ["node_modules"]
+// }
