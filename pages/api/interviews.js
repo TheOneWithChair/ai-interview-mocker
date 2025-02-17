@@ -37,24 +37,25 @@
 
 
 // pages/api/interviews.js
-import { db } from "@/utils/db"; // Ensure db.js is only used on the server side
-import { MockInterview } from "@/utils/schema"; // Adjust path if needed
+"use server"
+import { db } from "@/utils/db"; // Make sure this path is correct
+import { MockInterview } from "@/utils/schema"; // Make sure this path is correct
 import { v4 as uuidv4 } from "uuid";
 import moment from "moment";
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
+    // Destructure the body of the request
     const { jobPosition, jobDescription, jobExperience, user } = req.body;
     const mockId = uuidv4();
     const createdAt = moment().format("DD-MM-YYYY");
 
     try {
-      // Insert mock interview data into the database
       const result = await db
         .insert(MockInterview)
         .values({
-          mockId,
-          jsonMockResp: JSON.stringify([]), // Set your mock response data here
+          mockId: uuidv4(),
+          jsonMockResp: JSON.stringify([]), // Placeholder, replace with actual mock response
           jobPosition,
           jobDesc: jobDescription,
           jobExperience,
@@ -69,6 +70,6 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Internal server error" });
     }
   } else {
-    return res.status(405).json({ error: "Method Not Allowed" });
+    return res.status(405).json({ error: "Method Not Allowed" });  // Only POST is allowed here
   }
 }
