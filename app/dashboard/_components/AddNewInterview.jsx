@@ -70,7 +70,7 @@ function AddNewInterview() {
           }).returning({ mockId: MockInterview.mockId });
           console.log("Interview created:", res);
         setLoading(false);
-        router.push(`dashboard/interview/${res[0]?.mockId}`);
+        router.push(`/dashboard/interview/${res[0]?.mockId}`);
       } catch (dbError) {
         console.error("Database error:", dbError);
         setError("Database connection error. Please check your configuration.");
