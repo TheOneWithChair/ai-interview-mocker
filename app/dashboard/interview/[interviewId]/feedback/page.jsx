@@ -17,6 +17,7 @@ import { useMemo } from "react";
 const Feedback = ({ params }) => {
   const router = useRouter();
   const [feedbackList, setFeedbackList] = useState([]);
+  const interviewId = React.use(params).interviewId;
 
   useEffect(() => {
     GetFeedback();
@@ -26,7 +27,7 @@ const Feedback = ({ params }) => {
     const result = await db
       .select()
       .from(UserAnswer)
-      .where(eq(UserAnswer.mockIdRef, params.interviewId))
+      .where(eq(UserAnswer.mockIdRef, interviewId))
       .orderBy(UserAnswer.id);
 
     console.log(result);
