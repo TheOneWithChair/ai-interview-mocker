@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm"
 import { Button } from "@/components/ui/Button"
 import QuestionSection from "./_components/QuestionSection";
 import RecordAnswerSection from "./_components/RecordAnswerSection";
+import Link from "next/link";
 
 
 function StartInterview({params}) {

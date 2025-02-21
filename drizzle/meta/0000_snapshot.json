@@ -1,5 +1,5 @@
 {
-  "id": "8d081959-5969-44b4-82fc-512cd53691fa",
+  "id": "3f1f69b4-8aee-437b-8634-e44d33a4035e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -22,37 +22,38 @@
         },
         "jobPosition": {
           "name": "jobPosition",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
         "jobDesc": {
           "name": "jobDesc",
-          "type": "varchar",
+          "type": "varchar(1000)",
           "primaryKey": false,
           "notNull": true
         },
         "jobExperience": {
           "name": "jobExperience",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
         "createdBy": {
           "name": "createdBy",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
         "createdAt": {
           "name": "createdAt",
-          "type": "varchar",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "now()"
         },
         "mockId": {
           "name": "mockId",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         }
@@ -77,13 +78,13 @@
         },
         "newName": {
           "name": "newName",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
         },
         "newEmail": {
           "name": "newEmail",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
         },
@@ -95,9 +96,10 @@
         },
         "createdAt": {
           "name": "createdAt",
-          "type": "varchar",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -126,49 +128,50 @@
         },
         "jobPosition": {
           "name": "jobPosition",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
         "jobDesc": {
           "name": "jobDesc",
-          "type": "varchar",
+          "type": "varchar(1000)",
           "primaryKey": false,
           "notNull": true
         },
         "jobExperience": {
           "name": "jobExperience",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
         "typeQuestion": {
           "name": "typeQuestion",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
         "company": {
           "name": "company",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
         "createdBy": {
           "name": "createdBy",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
         "createdAt": {
           "name": "createdAt",
-          "type": "varchar",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "now()"
         },
         "mockId": {
           "name": "mockId",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         }
@@ -193,13 +196,13 @@
         },
         "mockId": {
           "name": "mockId",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
         "question": {
           "name": "question",
-          "type": "varchar",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -223,21 +226,22 @@
         },
         "rating": {
           "name": "rating",
-          "type": "varchar",
+          "type": "varchar(10)",
           "primaryKey": false,
           "notNull": false
         },
         "userEmail": {
           "name": "userEmail",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
         },
         "createdAt": {
           "name": "createdAt",
-          "type": "varchar",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {},

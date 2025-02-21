@@ -7,15 +7,20 @@ import { eq } from "drizzle-orm"
 import { Lightbulb, WebcamIcon } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import Webcam from "react-webcam";
+import { WebCamContext } from "@/app/dashboard/upgrade/layout";
+
+
+
 import Link from "next/link"
 
 export default function Interview({ params }) {
   const interviewId = React.use(params).interviewId
   const [interviewData, setInterviewData] = useState(null)
-  const [webCamEnabled, setWebCamEnabled] = useState(false)
+  const [webCamEnabled, setWebCamEnabled] = useContext(WebCamContext);
 
   useEffect(() => {
-    GetInterviewDetails()
+    GetInterviewDetails(),
+    React.use(params).interviewId
   }, [interviewId])
   
   const GetInterviewDetails = async () => {

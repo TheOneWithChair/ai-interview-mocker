@@ -2,10 +2,10 @@
 
 import React, { createContext, useState } from "react"
 
-// Create the context
+// Create the context with TypeScript-friendly defaults
 export const WebCamContext = createContext({
   webCamEnabled: false,
-  setWebCamEnabled: () => {}
+  setWebCamEnabled: (value) => {}
 })
 
 export default function DashboardLayout({ children }) {

@@ -97,53 +97,77 @@ const RecordAnswerSection = ({
   const updateUserAnswer = async () => {
     try {
       setLoading(true);
-      const feedbackPrompt =
-        "Question:" +
-        mockInterviewQuestion[activeQuestionIndex]?.Question +
-        ", User Answer:" +
-        userAnswer +
-        " , Depends on question and user answer for given interview question" +
-        " please give us rating for answer and feedback as area of improvement if any " +
-        "in just 3 to 5 lines to improve it in JSON format with rating field and feedback field";
-
+  
+      // 🔹 Debugging: Log mockInterviewQuestion and activeQuestionIndex
+      console.log("🔍 Current activeQuestionIndex:", activeQuestionIndex);
+      console.log("🔍 mockInterviewQuestion:", mockInterviewQuestion);
+  
+      // Get the current question
+      const questionText = mockInterviewQuestion?.[activeQuestionIndex]?.question;
+  
+      // 🔹 Debugging: Log the question before proceeding
+      console.log("🔍 Extracted Question:", questionText);
+  
+      if (!questionText) {
+        throw new Error("❌ Question is missing or undefined.");
+      }
+  
+      const feedbackPrompt = `
+        Question: ${questionText}
+        User Answer: ${userAnswer}
+        Please provide a rating and feedback in JSON format (fields: rating, feedback).
+      `;
+  
       const result = await chatSession.sendMessage(feedbackPrompt);
-
-      let MockJsonResp = result.response.text();
-      console.log(MockJsonResp);
-
-      // Removing possible extra text around JSON
-      MockJsonResp = MockJsonResp.replace("```json", "").replace("```", "");
-
-      // Attempt to parse JSON
+      let MockJsonResp = await result.response.text();
+  
+      // Extract valid JSON
       let jsonFeedbackResp;
       try {
-        jsonFeedbackResp = JSON.parse(MockJsonResp);
+        const jsonMatch = MockJsonResp.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          jsonFeedbackResp = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Invalid JSON response.");
+        }
       } catch (e) {
-        throw new Error("Invalid JSON response: " + MockJsonResp);
+        console.error("Error parsing JSON:", MockJsonResp);
+        toast("Error processing feedback. Please try again.");
+        return;
       }
-
-      const resp = await db.insert(UserAnswer).values({
-        mockIdRef: interviewData?.mockId,
-        question: mockInterviewQuestion[activeQuestionIndex]?.Question,
-        correctAns: mockInterviewQuestion[activeQuestionIndex]?.Answer,
-        userAns: userAnswer,
-        feedback: jsonFeedbackResp?.feedback,
-        rating: jsonFeedbackResp?.rating,
-        userEmail: user?.primaryEmailAddress?.emailAddress,
-        createdAt: moment().format("YYYY-MM-DD"),
-      });
-
+  
+      const insertData = {
+        mockIdRef: interviewData?.mockId || "Unknown Mock ID",
+        question: questionText, // ✅ Ensuring question is not null
+        correctAns: mockInterviewQuestion?.[activeQuestionIndex]?.Answer || "N/A",
+        userAns: userAnswer || "No answer provided",
+        feedback: jsonFeedbackResp?.feedback || "No feedback",
+        rating: jsonFeedbackResp?.rating || "No rating",
+        userEmail: user?.primaryEmailAddress?.emailAddress || "Unknown",
+        createdAt: new Date(), // ✅ Ensure timestamp is a Date object
+      };
+  
+      console.log("🔹 Data to Insert:", insertData);
+  
+      const resp = await db.insert(UserAnswer).values(insertData);
+  
       if (resp) {
+        console.log("✅ Insert successful:", resp);
         toast("User Answer recorded successfully");
+      } else {
+        throw new Error("Database insert failed");
       }
+  
       setUserAnswer("");
-      setLoading(false);
     } catch (error) {
-      console.error(error);
-      toast("An error occurred while recording the user answer");
+      console.error("🚨 DB Insert Error:", error);
+      toast(error.message || "Failed to save your answer. Please try again.");
+    } finally {
       setLoading(false);
     }
   };
+  
+  
 
   return (
     <div className="flex flex-col items-center justify-center overflow-hidden">
