@@ -23,6 +23,7 @@ const RecordAnswerSection = ({
   const { user } = useUser();
   const [loading, setLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [results, setResults] = useState([]);
   const { webCamEnabled, setWebCamEnabled } = useContext(WebCamContext);
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
@@ -159,6 +160,8 @@ const RecordAnswerSection = ({
       }
   
       setUserAnswer("");
+      setResults([]);
+     
     } catch (error) {
       console.error("🚨 DB Insert Error:", error);
       toast(error.message || "Failed to save your answer. Please try again.");
