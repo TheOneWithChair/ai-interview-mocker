@@ -1,26 +1,22 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { db } from "@/utils/db"
 import { MockInterview } from "@/utils/schema"
 import { eq } from "drizzle-orm"
 import { Lightbulb, WebcamIcon } from "lucide-react"
 import { Button } from "@/components/ui/Button"
-import Webcam from "react-webcam";
-import { WebCamContext } from "@/app/dashboard/upgrade/layout";
-
-
-
+import Webcam from "react-webcam"
+import { WebCamContext } from "@/app/dashboard/layout"
 import Link from "next/link"
 
 export default function Interview({ params }) {
   const interviewId = React.use(params).interviewId
   const [interviewData, setInterviewData] = useState(null)
-  const [webCamEnabled, setWebCamEnabled] = useContext(WebCamContext);
+  const { webCamEnabled, setWebCamEnabled } = useContext(WebCamContext)
 
   useEffect(() => {
-    GetInterviewDetails(),
-    React.use(params).interviewId
+    GetInterviewDetails()
   }, [interviewId])
   
   const GetInterviewDetails = async () => {
