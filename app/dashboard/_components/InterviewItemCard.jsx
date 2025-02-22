@@ -14,16 +14,28 @@ const InterviewItemCard = ({interview}) => {
         router.push("/dashboard/interview/"+interview?.mockId+"/feedback")
     }
 
-    const formattedDate = interview?.createdAt 
-        ? moment(interview.createdAt).format('MMMM Do YYYY, h:mm a')
-        : 'No date available'
+    const formatDate = (dateString) => {
+        if (!dateString) return 'No date available';
+        
+        // Convert the PostgreSQL timestamp to a moment object
+        try {
+            const date = moment(new Date(dateString));
+            return date.isValid() 
+                ? date.format('MMMM Do YYYY, h:mm a')
+                : 'Invalid date format';
+        } catch (error) {
+            console.error('Date parsing error:', error);
+            return 'Invalid date format';
+        }
+    }
 
     return (
         <div className="border border-gray-500 shadow-sm rounded-lg p-3">
             <h2 className='font-bold text-primary'>{interview?.jobPosition}</h2>
             <h2 className='text-sm text-gray-600'>{interview?.jobExperience} Years of experience</h2>
-            <h2 className="text-xs text-gray-400">Created At: {formattedDate}</h2>
-
+            <h2 className="text-xs text-gray-400">
+                Created At: {formatDate(interview?.createdAt)}
+            </h2>
             <div className='flex justify-between mt-2 gap-5'>
                 <Button onClick={onFeedback} size="sm" className="w-full">Feedback</Button>
                 <Button onClick={onStart} size="sm" className="w-full">Start</Button>

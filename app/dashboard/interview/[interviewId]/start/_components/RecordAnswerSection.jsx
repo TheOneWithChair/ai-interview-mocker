@@ -140,7 +140,7 @@ const RecordAnswerSection = ({
       const insertData = {
         mockIdRef: interviewData?.mockId || "Unknown Mock ID",
         question: questionText, // ✅ Ensuring question is not null
-        correctAns: mockInterviewQuestion?.[activeQuestionIndex]?.Answer || "N/A",
+        correctAns: mockInterviewQuestion?.[activeQuestionIndex]?.answer || "N/A",
         userAns: userAnswer || "No answer provided",
         feedback: jsonFeedbackResp?.feedback || "No feedback",
         rating: jsonFeedbackResp?.rating || "No rating",

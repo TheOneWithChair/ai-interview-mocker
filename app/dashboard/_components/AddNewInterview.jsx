@@ -65,7 +65,7 @@ function AddNewInterview() {
             jobDesc: jobDescription,
             jobExperience: jobExperience,
             createdBy: user?.primaryEmailAddress?.emailAddress,
-            // createdAt will use defaultNow() from schema
+            createdAt: new Date(),
           })
           .returning({ mockId: MockInterview.mockId });
 
