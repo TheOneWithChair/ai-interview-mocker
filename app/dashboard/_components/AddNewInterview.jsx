@@ -66,6 +66,7 @@ function AddNewInterview() {
             jobExperience: jobExperience,
             createdBy: user?.primaryEmailAddress?.emailAddress,
             createdAt: new Date(),
+            // createdAt: new Date().toISOString(),
           })
           .returning({ mockId: MockInterview.mockId });
 

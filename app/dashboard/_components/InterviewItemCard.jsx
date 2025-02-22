@@ -6,6 +6,10 @@ import moment from 'moment'
 const InterviewItemCard = ({interview}) => {
     const router = useRouter()
     
+    // Add this console.log to see the actual value and type
+    console.log('CreatedAt value:', interview?.createdAt);
+    console.log('CreatedAt type:', typeof interview?.createdAt);
+    
     const onStart = () => {
         router.push("/dashboard/interview/"+interview?.mockId)
     }
@@ -17,16 +21,19 @@ const InterviewItemCard = ({interview}) => {
     const formatDate = (dateString) => {
         if (!dateString) return 'No date available';
         
-        // Convert the PostgreSQL timestamp to a moment object
-        try {
-            const date = moment(new Date(dateString));
-            return date.isValid() 
-                ? date.format('MMMM Do YYYY, h:mm a')
-                : 'Invalid date format';
-        } catch (error) {
-            console.error('Date parsing error:', error);
-            return 'Invalid date format';
+        // Try parsing the date directly first
+        const date = moment(dateString);
+        if (date.isValid()) {
+            return date.format('MMMM Do YYYY, h:mm a');
         }
+        
+        // If that fails, try parsing as DD-MM-YYYY
+        const altDate = moment(dateString, 'DD-MM-YYYY');
+        if (altDate.isValid()) {
+            return altDate.format('MMMM Do YYYY');
+        }
+
+        return 'Invalid date format';
     }
 
     return (
