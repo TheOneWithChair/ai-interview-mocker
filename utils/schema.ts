@@ -1,16 +1,27 @@
 import { serial, text, varchar, timestamp } from "drizzle-orm/pg-core";
 import { pgTable } from "drizzle-orm/pg-core";
 
+// export const MockInterview = pgTable('mockInterview', {
+//     id: serial('id').primaryKey(),
+//     jsonMockResp: text('jsonMockResp').notNull(),
+//     jobPosition: varchar('jobPosition', { length: 255 }).notNull(),
+//     jobDesc: varchar('jobDesc', { length: 1000 }).notNull(),
+//     jobExperience: varchar('jobExperience', { length: 255 }).notNull(),
+//     createdBy: varchar('createdBy', { length: 255 }).notNull(),
+//     createdAt: timestamp("createdAt", { mode: "date" }).defaultNow(),
+//     // createdAt: timestamp('createdAt').defaultNow(),
+//     mockId: varchar('mockId', { length: 255 }).notNull()
+// });
+
 export const MockInterview = pgTable('mockInterview', {
-    id: serial('id').primaryKey(),
-    jsonMockResp: text('jsonMockResp').notNull(),
-    jobPosition: varchar('jobPosition', { length: 255 }).notNull(),
-    jobDesc: varchar('jobDesc', { length: 1000 }).notNull(),
-    jobExperience: varchar('jobExperience', { length: 255 }).notNull(),
-    createdBy: varchar('createdBy', { length: 255 }).notNull(),
-    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow(),
-    // createdAt: timestamp('createdAt').defaultNow(),
-    mockId: varchar('mockId', { length: 255 }).notNull()
+  id: serial('id').primaryKey(),
+  jsonMockResp: text('jsonMockResp').notNull(),
+  jobPosition: varchar('jobPosition', { length: 255 }).notNull(),
+  jobDesc: varchar('jobDesc', { length: 1000 }).notNull(),
+  jobExperience: varchar('jobExperience', { length: 255 }).notNull(),
+  createdBy: varchar('createdBy', { length: 255 }).notNull(),
+  createdAt: timestamp('createdAt', { mode: 'string' }).defaultNow(),
+  mockId: varchar('mockId', { length: 255 }).notNull()
 });
 
 export const Question = pgTable("question", {
