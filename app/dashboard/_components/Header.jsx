@@ -103,8 +103,8 @@ const Header = () => {
           <div className="flex items-center justify-between">
             {/* LOGO */}
             <Link href="/dashboard" className="flex items-center space-x-2">
-              <Image src="/logosaas.png" alt="SaaS Logo" width={40} height={40} />
-              <span className="text-lg font-semibold text-gray-700">AI SaaS</span>
+              <Image src="/favicon.ico" alt="SaaS Logo" width={40} height={40} />
+              <span className="text-lg font-semibold text-gray-700">IntelliMockAI</span>
             </Link>
 
             <nav className="hidden md:flex gap-6 text-black/60 items-center">
