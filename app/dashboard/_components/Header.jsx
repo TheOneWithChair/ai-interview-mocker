@@ -88,13 +88,17 @@ const Header = () => {
     <header className="sticky top-0 backdrop-blur-sm z-20">
       {/* Top banner */}
       <div className="flex justify-center items-center py-3 bg-black text-white text-sm gap-3">
-        <p className="text-white/60 md:block hidden">
-          Streamline your workflow and boost your productivity
-        </p>
+      
+  <p className="text-white/60 hover:text-white transition duration-200 cursor-pointer">
+    Streamline your workflow and boost your productivity
+  </p>
+
+  <Link href="/dashboard/howitworks" className="md:block hidden">
         <div className="inline-flex gap-1 items-center">
           <p>Get started for free</p>
           <Image src="/arrow-right.svg" alt="Arrow Right" width={16} height={16} />
         </div>
+        </Link>
       </div>
 
       {/* Main header */}
