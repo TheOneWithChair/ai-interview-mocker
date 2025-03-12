@@ -120,9 +120,9 @@ const Header = () => {
                 Dashboard
               </Link>
               <Link
-                href="/dashboard/FAQ"
+                href="/dashboard/faq"
                 className={`hover:text-primary hover:font-bold transition-colors
-                  ${path === '/dashboard/FAQ' ? 'text-primary font-bold' : ''}`}
+                  ${path === '/dashboard/faq' ? 'text-primary font-bold' : ''}`}
               >
                 Questions
               </Link>

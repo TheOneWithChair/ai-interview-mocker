@@ -2,7 +2,7 @@
 
 import React from "react";
 
-// FAQ data (Updated for AI Interview context)
+// FAQ data
 const faqsList = [
   {
     q: "How does the AI mock interview work?",
@@ -30,7 +30,7 @@ const faqsList = [
   },
 ];
 
-export const FAQ = () => {
+export default function FAQPage() {
   return (
     <div className="leading-relaxed mt-12 mx-4 md:mx-8">
       {/* Title Section */}
@@ -44,9 +44,7 @@ export const FAQ = () => {
       </div>
 
       {/* FAQ Section */}
-      <div
-        className="relative bg-white rounded-lg mt-10 md:max-w-3xl lg:max-w-4xl xl:max-w-5xl sm:mx-auto p-8 shadow-lg"
-      >
+      <div className="relative bg-white rounded-lg mt-10 md:max-w-3xl lg:max-w-4xl xl:max-w-5xl sm:mx-auto p-8 shadow-lg">
         <div className="grid gap-6 md:grid-cols-2">
           {faqsList.map((item, idx) => (
             <div className="space-y-3" key={idx}>
@@ -61,6 +59,4 @@ export const FAQ = () => {
       </div>
     </div>
   );
-};
-
-export default FAQ;
+}
