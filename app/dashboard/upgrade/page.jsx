@@ -202,7 +202,7 @@ const pricingTiers = [
   },
 ];
 
-export const Pricing = () => {
+export default function PricingPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState("");
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
@@ -348,6 +348,4 @@ export const Pricing = () => {
       </section>
     </>
   );
-};
-
-export default Pricing;
+}
