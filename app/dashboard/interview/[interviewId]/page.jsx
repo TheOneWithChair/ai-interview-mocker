@@ -58,9 +58,11 @@ export default function Interview({ params }) {
               <Lightbulb />
               <strong>Information</strong>
             </h2>
-            <h2 className="mt-3 text-yellow-500">
-              {process.env.NEXT_PUBLIC_INFORMATION}
-            </h2>
+            <div className="mt-3 text-yellow-700 space-y-2">
+                {process.env.NEXT_PUBLIC_INFORMATION?.split("\n").map((line, index) => (
+                  <p key={index}>{line}</p>
+                ))}
+              </div>
           </div>
         </div>
         <div>

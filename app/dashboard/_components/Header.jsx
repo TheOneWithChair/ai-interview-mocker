@@ -102,7 +102,7 @@ const Header = () => {
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between">
             {/* LOGO */}
-            <Link href="/dashboard" className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center space-x-2">
               <Image src="/favicon.ico" alt="SaaS Logo" width={40} height={40} />
               <span className="text-lg font-semibold text-gray-700">IntelliMockAI</span>
             </Link>
@@ -116,9 +116,9 @@ const Header = () => {
                 Dashboard
               </Link>
               <Link
-                href="/dashboard/questions"
+                href="/dashboard/FAQ"
                 className={`hover:text-primary hover:font-bold transition-colors
-                  ${path === '/dashboard/questions' ? 'text-primary font-bold' : ''}`}
+                  ${path === '/dashboard/FAQ' ? 'text-primary font-bold' : ''}`}
               >
                 Questions
               </Link>
