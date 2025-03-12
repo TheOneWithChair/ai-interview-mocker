@@ -36,7 +36,7 @@ const features = [
   },
 ];
 
-export const HowItWorks = () => {
+export default function HowItWorksPage() {
   return (
     <section className="py-14 bg-white">
       <div className="max-w-screen-xl mx-auto px-6 sm:px-12 md:px-16 lg:px-24 xl:px-32 text-gray-600">
@@ -65,6 +65,4 @@ export const HowItWorks = () => {
       </div>
     </section>
   );
-};
-
-export default HowItWorks;
+}
