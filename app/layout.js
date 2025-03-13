@@ -36,6 +36,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner"; // ✅ Ensure correct import
 import { ThemeProvider } from "@/components/ui/theme-provider"; // ✅ Ensure correct import
+import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -70,7 +71,7 @@ export default function RootLayout({ children }) {
           >
             {children}
           </ThemeProvider>
-
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
