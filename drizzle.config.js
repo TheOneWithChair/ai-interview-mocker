@@ -1,15 +1,13 @@
 const { defineConfig } = require("drizzle-kit");
-
-
+require("dotenv").config();
 
 export default defineConfig({
-    dialect: "postgresql",
-    schema: "./utils/schema.ts", // Change .js -> .ts
-    dbCredentials: {
-      url: 'postgresql://neondb_owner:npg_JP8XIZFxq6kg@ep-fancy-sun-a1uav4xt-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require'
-    },
-  });
-  
+  dialect: "postgresql",
+  schema: "./utils/schema.ts", // Change .js -> .ts
+  dbCredentials: {
+    url: process.env.DRIZZLE_DB_URL,
+  },
+});
 
 // /** @type { import("drizzle-kit").Config } */
 // import "dotenv/config"; // ✅ Load .env file
@@ -22,19 +20,17 @@ export default defineConfig({
 //     },
 // };
 
+// const { defineConfig } = require("drizzle-kit");
+// require('dotenv').config();
 
-
-  // const { defineConfig } = require("drizzle-kit");
-  // require('dotenv').config();
-  
-  // module.exports = defineConfig({
-  //   schema: "./utils/schema.ts",
-  //   out: "./drizzle",
-  //   dialect: "pg",
-  //   dbCredentials: {
-  //     connectionString: process.env.DATABASE_URL
-  //   }
-  // });
+// module.exports = defineConfig({
+//   schema: "./utils/schema.ts",
+//   out: "./drizzle",
+//   dialect: "pg",
+//   dbCredentials: {
+//     connectionString: process.env.DATABASE_URL
+//   }
+// });
 // const { defineConfig } = require("drizzle-kit");
 // require('dotenv').config();
 

@@ -1,40 +1,37 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState, useContext } from 'react'
-import { db } from "@/utils/db"
-import { MockInterview } from "@/utils/schema"
-import { eq } from "drizzle-orm"
-import { Lightbulb, WebcamIcon } from "lucide-react"
-import { Button } from "@/components/ui/Button"
-import Webcam from "react-webcam"
-import { WebCamContext } from "@/app/dashboard/layout"
-import Link from "next/link"
+import React, { useEffect, useState, useContext } from "react";
+import { Lightbulb, WebcamIcon } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import Webcam from "react-webcam";
+import { WebCamContext } from "@/app/dashboard/layout";
+import Link from "next/link";
 
 export default function Interview({ params }) {
-  const interviewId = React.use(params).interviewId
-  const [interviewData, setInterviewData] = useState(null)
-  const { webCamEnabled, setWebCamEnabled } = useContext(WebCamContext)
+  const interviewId = React.use(params).interviewId;
+  const [interviewData, setInterviewData] = useState(null);
+  const { webCamEnabled, setWebCamEnabled } = useContext(WebCamContext);
 
   useEffect(() => {
-    GetInterviewDetails()
-  }, [interviewId])
-  
+    GetInterviewDetails();
+  }, [interviewId]);
+
   const GetInterviewDetails = async () => {
     try {
-      const result = await db
-        .select()
-        .from(MockInterview)
-        .where(eq(MockInterview.mockId, interviewId))
-      
-      setInterviewData(result[0])
-      console.log('Interview Data:', result[0])
-      console.table(result)
-    } catch (error) {
-      console.error('Error fetching interview:', error)
-    }
-  }
+      const response = await fetch(`/api/interview/${interviewId}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch interview");
+      }
+      const result = await response.json();
 
-  return  (
+      setInterviewData(result);
+      console.log("Interview Data:", result);
+    } catch (error) {
+      console.error("Error fetching interview:", error);
+    }
+  };
+
+  return (
     <div className="my-10">
       <h2 className="font-bold text-2xl text-center">Let's Get Started</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 ">
@@ -59,10 +56,12 @@ export default function Interview({ params }) {
               <strong>Information</strong>
             </h2>
             <div className="mt-3 text-yellow-700 space-y-2">
-                {process.env.NEXT_PUBLIC_INFORMATION?.split("\n").map((line, index) => (
+              {process.env.NEXT_PUBLIC_INFORMATION?.split("\n").map(
+                (line, index) => (
                   <p key={index}>{line}</p>
-                ))}
-              </div>
+                )
+              )}
+            </div>
           </div>
         </div>
         <div>
@@ -98,4 +97,4 @@ export default function Interview({ params }) {
       </div>
     </div>
   );
-};
+}

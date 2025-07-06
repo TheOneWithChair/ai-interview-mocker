@@ -6,13 +6,9 @@ import React, { useContext, useEffect, useState, useRef } from "react";
 import Webcam from "react-webcam";
 import { Mic } from "lucide-react";
 import { toast } from "sonner";
-import { chatSession } from "@/utils/GeminiAIModal";
-import { db } from "@/utils/db";
-import { UserAnswer } from "@/utils/schema";
 import { useUser } from "@clerk/nextjs";
 import moment from "moment";
 import { WebCamContext } from "@/app/dashboard/layout";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const RecordAnswerSection = ({
   mockInterviewQuestion,
@@ -28,7 +24,7 @@ const RecordAnswerSection = ({
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
 
-  const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY);
+  // Remove direct Gemini usage - we'll use API route instead
 
   useEffect(() => {
     if (!isRecording && userAnswer.length > 10) {
@@ -49,7 +45,7 @@ const RecordAnswerSection = ({
       };
 
       mediaRecorderRef.current.onstop = async () => {
-        const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const audioBlob = new Blob(chunksRef.current, { type: "audio/webm" });
         await transcribeAudio(audioBlob);
       };
 
@@ -57,7 +53,9 @@ const RecordAnswerSection = ({
       setIsRecording(true);
     } catch (error) {
       console.error("Error starting recording:", error);
-      toast("Error starting recording. Please check your microphone permissions.");
+      toast(
+        "Error starting recording. Please check your microphone permissions."
+      );
     }
   };
 
@@ -71,22 +69,44 @@ const RecordAnswerSection = ({
   const transcribeAudio = async (audioBlob) => {
     try {
       setLoading(true);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      
+
       // Convert audio blob to base64
       const reader = new FileReader();
       reader.readAsDataURL(audioBlob);
       reader.onloadend = async () => {
-        const base64Audio = reader.result.split(',')[1];
-        
-        const result = await model.generateContent([
-          "Transcribe the following audio:",
-          { inlineData: { data: base64Audio, mimeType: "audio/webm" } },
-        ]);
+        const base64Audio = reader.result.split(",")[1];
 
-        const transcription = result.response.text();
-        setUserAnswer((prevAnswer) => prevAnswer + " " + transcription);
-        setLoading(false);
+        try {
+          const transcribeResponse = await fetch("/api/transcribe", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              audioData: base64Audio,
+              mimeType: "audio/webm",
+            }),
+          });
+
+          if (!transcribeResponse.ok) {
+            throw new Error("Failed to transcribe audio");
+          }
+
+          const transcribeResult = await transcribeResponse.json();
+
+          if (transcribeResult.success) {
+            setUserAnswer(
+              (prevAnswer) => prevAnswer + " " + transcribeResult.transcription
+            );
+          } else {
+            throw new Error("Transcription failed");
+          }
+        } catch (apiError) {
+          console.error("Error calling transcribe API:", apiError);
+          toast("Error transcribing audio. Please try again.");
+        } finally {
+          setLoading(false);
+        }
       };
     } catch (error) {
       console.error("Error transcribing audio:", error);
@@ -98,70 +118,89 @@ const RecordAnswerSection = ({
   const updateUserAnswer = async () => {
     try {
       setLoading(true);
-  
+
       // 🔹 Debugging: Log mockInterviewQuestion and activeQuestionIndex
       console.log("🔍 Current activeQuestionIndex:", activeQuestionIndex);
       console.log("🔍 mockInterviewQuestion:", mockInterviewQuestion);
-  
+
       // Get the current question
-      const questionText = mockInterviewQuestion?.[activeQuestionIndex]?.question;
-  
+      const questionText =
+        mockInterviewQuestion?.[activeQuestionIndex]?.question;
+
       // 🔹 Debugging: Log the question before proceeding
       console.log("🔍 Extracted Question:", questionText);
-  
+
       if (!questionText) {
         throw new Error("❌ Question is missing or undefined.");
       }
-  
+
       const feedbackPrompt = `
         Question: ${questionText}
         User Answer: ${userAnswer}
         Please provide a rating and feedback in JSON format (fields: rating, feedback).
       `;
-  
-      const result = await chatSession.sendMessage(feedbackPrompt);
-      let MockJsonResp = await result.response.text();
-  
-      // Extract valid JSON
-      let jsonFeedbackResp;
-      try {
-        const jsonMatch = MockJsonResp.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          jsonFeedbackResp = JSON.parse(jsonMatch[0]);
-        } else {
-          throw new Error("Invalid JSON response.");
-        }
-      } catch (e) {
-        console.error("Error parsing JSON:", MockJsonResp);
-        toast("Error processing feedback. Please try again.");
-        return;
+
+      // Use the feedback API route instead of direct Gemini access
+      const feedbackResponse = await fetch("/api/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          question: questionText,
+          userAnswer: userAnswer,
+        }),
+      });
+
+      if (!feedbackResponse.ok) {
+        throw new Error("Failed to get feedback");
       }
-  
+
+      const feedbackResult = await feedbackResponse.json();
+
+      if (!feedbackResult.success) {
+        throw new Error("Failed to generate feedback");
+      }
+
+      // Use the new feedbackData from the API response
+      const jsonFeedbackResp = feedbackResult.feedbackData;
+
       const insertData = {
         mockIdRef: interviewData?.mockId || "Unknown Mock ID",
         question: questionText, // ✅ Ensuring question is not null
-        correctAns: mockInterviewQuestion?.[activeQuestionIndex]?.answer || "N/A",
+        correctAns:
+          mockInterviewQuestion?.[activeQuestionIndex]?.answer || "N/A",
         userAns: userAnswer || "No answer provided",
         feedback: jsonFeedbackResp?.feedback || "No feedback",
         rating: jsonFeedbackResp?.rating || "No rating",
         userEmail: user?.primaryEmailAddress?.emailAddress || "Unknown",
         createdAt: new Date(), // ✅ Ensure timestamp is a Date object
       };
-  
       console.log("🔹 Data to Insert:", insertData);
-  
-      const resp = await db.insert(UserAnswer).values(insertData);
-  
-      if (resp) {
-        console.log("✅ Insert successful:", resp);
+
+      const response = await fetch("/api/save-answer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(insertData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save answer");
+      }
+
+      const saveResult = await response.json();
+
+      if (saveResult.success) {
+        console.log("✅ Insert successful:", saveResult);
         toast("User Answer recorded successfully");
       } else {
         throw new Error("Database insert failed");
       }
-  
+
       setUserAnswer("");
       setResults([]);
-     
     } catch (error) {
       console.error("🚨 DB Insert Error:", error);
       toast(error.message || "Failed to save your answer. Please try again.");
@@ -169,8 +208,6 @@ const RecordAnswerSection = ({
       setLoading(false);
     }
   };
-  
-  
 
   return (
     <div className="flex flex-col items-center justify-center overflow-hidden">
@@ -181,7 +218,12 @@ const RecordAnswerSection = ({
             style={{ height: 250, width: "100%", zIndex: 10 }}
           />
         ) : (
-          <Image src={"/camera.jpg"} width={200} height={200} alt="Camera placeholder" />
+          <Image
+            src={"/camera.jpg"}
+            width={200}
+            height={200}
+            alt="Camera placeholder"
+          />
         )}
       </div>
       <div className="md:flex mt-4 md:mt-8 md:gap-5">
@@ -216,4 +258,3 @@ const RecordAnswerSection = ({
 };
 
 export default RecordAnswerSection;
-

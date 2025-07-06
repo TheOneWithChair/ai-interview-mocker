@@ -76,17 +76,12 @@
 
 // export default InterviewList;
 
-
-
 // InterviewList.jsx
 // InterviewList.jsx
 "use client";
 
 import { useUser } from "@clerk/nextjs";
 import React, { useEffect, useState } from "react";
-import { db } from "@/utils/db";
-import { MockInterview } from "@/utils/schema";
-import { desc, eq } from "drizzle-orm";
 import InterviewItemCard from "./InterviewItemCard";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -104,20 +99,20 @@ const InterviewList = () => {
   const GetInterviewList = async () => {
     try {
       setLoading(true);
-      const result = await db
-        .select()
-        .from(MockInterview)
-        .where(
-          eq(MockInterview.createdBy, user?.primaryEmailAddress?.emailAddress)
-        )
-        .orderBy(desc(MockInterview.id));
+      const response = await fetch(
+        `/api/interviews?userEmail=${user?.primaryEmailAddress?.emailAddress}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch interviews");
+      }
+      const result = await response.json();
 
       // The timestamps should now come as strings from the database
-      console.log('Raw database results:', result);
+      console.log("Raw database results:", result);
 
       setInterviewList(result);
     } catch (error) {
-      console.error('Error fetching interviews:', error);
+      console.error("Error fetching interviews:", error);
     } finally {
       setLoading(false);
     }
@@ -142,7 +137,10 @@ const InterviewList = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 my-3">
         {interviewList.length > 0 ? (
           interviewList.map((interview, index) => (
-            <InterviewItemCard key={interview.id || index} interview={interview} />
+            <InterviewItemCard
+              key={interview.id || index}
+              interview={interview}
+            />
           ))
         ) : (
           <p className="text-gray-500">No previous interviews found</p>

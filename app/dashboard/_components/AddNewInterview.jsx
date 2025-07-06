@@ -11,11 +11,8 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { chatSession } from "@/utils/GeminiAIModal";
 import { LoaderCircle } from "lucide-react";
-import { MockInterview } from "@/utils/schema";
-import { v4 as uuidv4 } from 'uuid';
-import { db } from "@/utils/db";
+import { v4 as uuidv4 } from "uuid";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
@@ -34,44 +31,57 @@ function AddNewInterview() {
     setLoading(true);
     setError("");
 
-    const inputPrompt = `Job position: ${jobPosition}, Job Description: ${jobDescription}, Years of Experience: ${jobExperience}, Depends on Job Position, Job Description and Years of Experience give us ${process.env.NEXT_PUBLIC_INTERVIEW_QUESTION_COUNT} Interview question along with Answer in JSON format, Give us question and Answer field on JSON,Each question and answer should be in the format:
-    {
-      "question": "Your question here",
-      "answer": "Your answer here"
-    }`;
-
     try {
-      const result = await chatSession.sendMessage(inputPrompt);
-      const responseText = await result.response.text();
-      
-      // Remove markdown code blocks if present
-      let cleanedText = responseText.replace(/```json|```/g, '').trim();
-      
-      // Try to find valid JSON array in the response
-      const jsonMatch = cleanedText.match(/\[\s*\{[\s\S]*\}\s*\]/s);
-      if (!jsonMatch) {
-        throw new Error("No valid JSON array found in the response");
+      // Generate questions using the API
+      const questionsResponse = await fetch("/api/generate-questions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jobPosition,
+          jobDescription,
+          jobExperience,
+          questionCount: process.env.NEXT_PUBLIC_INTERVIEW_QUESTION_COUNT || 5,
+        }),
+      });
+
+      if (!questionsResponse.ok) {
+        throw new Error("Failed to generate questions");
       }
-      
-      const jsonResponsePart = jsonMatch[0];
-      const mockResponse = JSON.parse(jsonResponsePart.trim());
-      
+
+      const questionsResult = await questionsResponse.json();
+
+      if (!questionsResult.success) {
+        throw new Error("Failed to generate interview questions");
+      }
+
+      const mockResponse = questionsResult.questions;
+
       try {
-        const res = await db.insert(MockInterview)
-          .values({
-            mockId: uuidv4(),
+        const mockId = uuidv4();
+        const response = await fetch("/api/interviews", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            mockId: mockId,
             jsonMockResp: JSON.stringify(mockResponse),
             jobPosition: jobPosition,
-            jobDesc: jobDescription,
+            jobDescription: jobDescription,
             jobExperience: jobExperience,
             createdBy: user?.primaryEmailAddress?.emailAddress,
-            createdAt: new Date(),
-            // createdAt: new Date().toISOString(),
-          })
-          .returning({ mockId: MockInterview.mockId });
+          }),
+        });
 
+        if (!response.ok) {
+          throw new Error("Failed to create interview");
+        }
+
+        const result = await response.json();
         setLoading(false);
-        router.push(`/dashboard/interview/${res[0]?.mockId}`);
+        router.push(`/dashboard/interview/${result.mockId}`);
       } catch (dbError) {
         console.error("Database error:", dbError);
         setError("Failed to save interview. Please try again.");
@@ -79,7 +89,10 @@ function AddNewInterview() {
       }
     } catch (error) {
       console.error("Error:", error);
-      setError(error.message || "Failed to generate interview questions. Please try again.");
+      setError(
+        error.message ||
+          "Failed to generate interview questions. Please try again."
+      );
       setLoading(false);
     }
   };
@@ -119,7 +132,9 @@ function AddNewInterview() {
                 />
               </div>
               <div>
-                <label className="block mb-2">Job Description/Tech Stack (In short)</label>
+                <label className="block mb-2">
+                  Job Description/Tech Stack (In short)
+                </label>
                 <Textarea
                   placeholder="Ex. React, Angular, NodeJs, MySql etc"
                   required
@@ -138,9 +153,9 @@ function AddNewInterview() {
                 />
               </div>
               <div className="flex gap-5 justify-end pt-4">
-                <Button 
-                  type="button" 
-                  variant="ghost" 
+                <Button
+                  type="button"
+                  variant="ghost"
                   onClick={() => setOpenDialog(false)}
                 >
                   Cancel
@@ -148,11 +163,11 @@ function AddNewInterview() {
                 <Button type="submit" disabled={loading}>
                   {loading ? (
                     <>
-                      <LoaderCircle className="animate-spin mr-2" /> 
+                      <LoaderCircle className="animate-spin mr-2" />
                       Generating from AI
                     </>
                   ) : (
-                    'Start Interview'
+                    "Start Interview"
                   )}
                 </Button>
               </div>
