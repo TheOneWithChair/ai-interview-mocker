@@ -14,19 +14,37 @@ export async function POST(request) {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-    });
+    
+    // Try multiple models in case of rate limiting or availability issues
+    const modelNames = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.5-flash-lite"];
+    let result;
+    let lastError;
+    
+    for (const modelName of modelNames) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        
+        const inputPrompt = `Job position: ${jobPosition}, Job Description: ${jobDescription}, Years of Experience: ${jobExperience}, Depends on Job Position, Job Description and Years of Experience give us ${
+          questionCount || 5
+        } Interview question along with Answer in JSON format, Give us question and Answer field on JSON,Each question and answer should be in the format:
+        {
+          "question": "Your question here",
+          "answer": "Your answer here"
+        }`;
 
-    const inputPrompt = `Job position: ${jobPosition}, Job Description: ${jobDescription}, Years of Experience: ${jobExperience}, Depends on Job Position, Job Description and Years of Experience give us ${
-      questionCount || 5
-    } Interview question along with Answer in JSON format, Give us question and Answer field on JSON,Each question and answer should be in the format:
-    {
-      "question": "Your question here",
-      "answer": "Your answer here"
-    }`;
-
-    const result = await model.generateContent(inputPrompt);
+        result = await model.generateContent(inputPrompt);
+        break; // Success, exit loop
+      } catch (error) {
+        lastError = error;
+        console.log(`Failed with ${modelName}, trying next model...`);
+        continue;
+      }
+    }
+    
+    if (!result) {
+      throw lastError || new Error("All models failed");
+    }
+    
     const responseText = await result.response.text();
 
     // Remove markdown code blocks if present

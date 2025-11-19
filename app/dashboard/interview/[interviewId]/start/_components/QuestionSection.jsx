@@ -90,7 +90,7 @@ const QuestionSection = ({ mockInterviewQuestion, activeQuestionIndex }) => {
                 : "bg-secondary"
             }`}
           >
-            Question #{index + 1}
+            Question {index + 1}
           </h2>
         ))}
       </div>
